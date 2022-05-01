@@ -29,4 +29,4 @@ Documentation for how I setup and use this version of valet on my own system: [V
 
 ## License
 
-Laravel Valet is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+Laravel Valet is an open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)

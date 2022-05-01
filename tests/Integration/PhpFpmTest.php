@@ -8,7 +8,7 @@ use Valet\PhpFpm;
 
 class PhpFpmTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $_SERVER['SUDO_USER'] = user();
 
@@ -16,7 +16,7 @@ class PhpFpmTest extends TestCase
     }
 
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         exec('rm -rf ' . __DIR__ . '/output');
         mkdir(__DIR__ . '/output');
@@ -39,7 +39,7 @@ class PhpFpmTest extends TestCase
         $this->assertStringContainsString(sprintf("\ngroup = %s", group()), $contents);
         $this->assertStringContainsString(sprintf("\nlisten.owner = %s", user()), $contents);
         $this->assertStringContainsString(sprintf("\nlisten.group = %s", group()), $contents);
-        $this->assertStringContainsString("\nlisten = 127.0.0.1:9000", $contents);
+        $this->assertStringContainsString("\nlisten = " . VALET_HOME_PATH . "/valet.sock", $contents);
     }
 }
 

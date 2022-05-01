@@ -18,7 +18,7 @@ use Silly\Application;
  */
 Container::setInstance(new Container);
 
-$version = 'v1.0.6';
+$version = 'v2.2.32';
 
 $app = new Application('Valet', $version);
 
@@ -34,7 +34,6 @@ $app->command('install [--ignore-selinux]', function ($ignoreSELinux) {
     passthru(dirname(__FILE__) . '/scripts/update.sh'); // Clean up cruft
 
     Requirements::setIgnoreSELinux($ignoreSELinux)->check();
-    Configuration::install();
     Nginx::install();
     PhpFpm::install();
     // DnsMasq::install(Configuration::read()['domain']);
@@ -84,7 +83,7 @@ if (is_dir(VALET_HOME_PATH)) {
     /**
      * Get or set the port number currently being used by Valet.
      */
-    $app->command('port [port] [--https]', function ($port = null, $https) {
+    $app->command('port [port] [--https]', function ($port = null, $https = null) {
         if ($port === null) {
             info('Current Nginx port (HTTP): ' . Configuration::get('port', 80));
             info('Current Nginx port (HTTPS): ' . Configuration::get('https_port', 443));
@@ -204,6 +203,33 @@ if (is_dir(VALET_HOME_PATH)) {
 
         info('The [' . $url . '] site will now serve traffic over HTTP.');
     })->descriptions('Stop serving the given domain over HTTPS and remove the trusted TLS certificate');
+
+    /**
+     * Create an Nginx proxy config for the specified domain.
+     */
+    $app->command('proxy domain host [--secure]', function ($domain, $host, $secure) {
+        Site::proxyCreate($domain, $host, $secure);
+        Nginx::restart();
+    })->descriptions('Create an Nginx proxy site for the specified host. Useful for docker, mailhog etc.', [
+        '--secure' => 'Create a proxy with a trusted TLS certificate',
+    ]);
+
+    /**
+     * Delete an Nginx proxy config.
+     */
+    $app->command('unproxy domain', function ($domain) {
+        Site::proxyDelete($domain);
+        Nginx::restart();
+    })->descriptions('Delete an Nginx proxy config.');
+
+    /**
+     * Display all of the sites that are proxies.
+     */
+    $app->command('proxies', function () {
+        $proxies = Site::proxies();
+
+        table(['Site', 'SSL', 'URL', 'Host'], $proxies->all());
+    })->descriptions('Display all of the proxy sites');
 
     /**
      * Determine which Valet driver the current directory is using.

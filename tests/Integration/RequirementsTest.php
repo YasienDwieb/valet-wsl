@@ -7,7 +7,7 @@ use Valet\Requirements;
 
 class RequirementsTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $_SERVER['SUDO_USER'] = user();
 
@@ -15,7 +15,7 @@ class RequirementsTest extends TestCase
     }
 
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
